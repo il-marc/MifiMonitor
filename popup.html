@@ -1,0 +1,95 @@
+<!doctype html>
+<html ng-csp ng-app="PopUpApp">
+  <head>
+    <title>Getting Started Extension's Popup</title>
+    <style>
+      body {
+        min-width: 357px;
+        overflow-x: hidden;
+      }
+
+      img {
+        margin: 5px;
+        border: 2px solid black;
+        vertical-align: middle;
+        width: 75px;
+        height: 75px;
+      }
+
+       .goals {
+           width: 100%;
+       }
+        .goals th, .goals td {
+            text-align: right;
+        }
+
+        #speed_graph {
+            width: 100%;
+            height: 120px;
+        }
+
+       table td {
+           text-align: right;
+       }
+
+        table {
+            width: 100%;
+        }
+
+
+    </style>
+      <link rel="stylesheet" href="angular-csp.css" type="text/css"/>
+
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: http://developer.chrome.com/extensions/contentSecurityPolicy.html
+     -->
+      <script src="jquery-1.9.1.min.js"></script>
+      <script src="angular.min.js"></script>
+      <script src="angular-resource.min.js"></script>
+      <script src="highcharts.js"></script>
+    <script src="popup.js"></script>
+  </head>
+  <body ng-controller="PopUpCtrl">
+    <h3><span ng-bind="data.WwNetwkName"></span> - <span ng-bind="data.WwNetwkTech"></span></h3>
+    Battery: <span ng-bind="data.BaBattCapacity"></span>%
+    <span ng-show="data.BaBattChg == 1"> ( Charging! )</span>
+    <br/>
+   <span ng-bind="data.WiConnClients"></span> Devices Connected
+    <br/>
+   <span ng-bind="data.WwRssi"></span> Signal Bars<br/>
+
+    <h3>Speed</h3>
+    <div id="speed_graph"></div>
+
+    <h3>Connection History</h3>
+    <table>
+        <tr>
+            <th>Start</th>
+            <th>Length</th>
+            <th>Up</th>
+            <th>Down</th>
+            <th>Total</th>
+        </tr>
+        <tr style="color: blue;">
+            <td ng-bind="data.session_start.format('h:mm:ss a')"></td>
+            <td ng-bind="data.WwSessionTimeSecs|hms"></td>
+            <td ng-bind="data.WwSessionTxMb|number:2"></td>
+            <td ng-bind="data.WwSessionRxMb|number:2"></td>
+            <td ng-bind="total_data()|number:2"></td>
+        </tr>
+        <tr ng-repeat="conn in connection_history|limitTo:10 track by $index">
+            <td ng-bind="conn.session_start.format('h:mm:ss a')"></td>
+            <td ng-bind="conn.WwSessionTimeSecs|hms"></td>
+            <td ng-bind="conn.WwSessionTxMb|number:2"></td>
+            <td ng-bind="conn.WwSessionRxMb|number:2"></td>
+            <td ng-bind="conn.WwSessionTxMb + conn.WwSessionRxMb|number:2"></td>
+        </tr>
+    </table>
+
+
+  </body>
+</html>
+
