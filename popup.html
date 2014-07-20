@@ -39,6 +39,8 @@
 
     </style>
       <link rel="stylesheet" href="angular-csp.css" type="text/css"/>
+      <link rel="stylesheet" href="bootstrap.css" type="text/css"/>
+      <link rel="stylesheet" href="bootstrap-theme.css" type="text/css"/>
 
     <!--
       - JavaScript and HTML must be in separate files: see our Content Security
@@ -49,6 +51,7 @@
       <script src="jquery-1.9.1.min.js"></script>
       <script src="angular.min.js"></script>
       <script src="angular-resource.min.js"></script>
+      <script src="bootstrap.js"></script>
       <script src="highcharts.js"></script>
     <script src="popup.js"></script>
   </head>
@@ -65,7 +68,7 @@
     <div id="speed_graph"></div>
 
     <h3>Connection History</h3>
-    <table>
+    <table class="table">
         <tr>
             <th>Start</th>
             <th>Length</th>
@@ -73,7 +76,7 @@
             <th>Down</th>
             <th>Total</th>
         </tr>
-        <tr style="color: blue;">
+        <tr>
             <td ng-bind="data.session_start.format('h:mm:ss a')"></td>
             <td ng-bind="data.WwSessionTimeSecs|hms"></td>
             <td ng-bind="data.WwSessionTxMb|number:2"></td>
@@ -88,6 +91,9 @@
             <td ng-bind="conn.WwSessionTxMb + conn.WwSessionRxMb|number:2"></td>
         </tr>
     </table>
+    <div class="text-right">
+        <button class="btn btn-primary"> <span class="glyphicon glyphicon-repeat"></span> Reconnect</button>
+    </div>
   </body>
 </html>
 
