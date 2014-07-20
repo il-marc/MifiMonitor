@@ -54,7 +54,7 @@
   </head>
   <body ng-controller="PopUpCtrl">
     <h3><span ng-bind="data.WwNetwkName"></span> - <span ng-bind="data.WwNetwkTech"></span></h3>
-    Battery: <span ng-bind="data.BaBattCapacity"></span>%
+    Battery: <span ng-bind="data.BaBattStat"></span>/4
     <span ng-show="data.BaBattChg == 1"> ( Charging! )</span>
     <br/>
    <span ng-bind="data.WiConnClients"></span> Devices Connected
@@ -88,8 +88,6 @@
             <td ng-bind="conn.WwSessionTxMb + conn.WwSessionRxMb|number:2"></td>
         </tr>
     </table>
-
-
   </body>
 </html>
 
