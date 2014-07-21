@@ -38,9 +38,9 @@
 
 
     </style>
-      <link rel="stylesheet" href="angular-csp.css" type="text/css"/>
-      <link rel="stylesheet" href="bootstrap.css" type="text/css"/>
-      <link rel="stylesheet" href="bootstrap-theme.css" type="text/css"/>
+    <link rel="stylesheet" href="angular-csp.css" type="text/css"/>
+    <link rel="stylesheet" href="bootstrap.css" type="text/css"/>
+    <link rel="stylesheet" href="bootstrap-theme.css" type="text/css"/>
 
     <!--
       - JavaScript and HTML must be in separate files: see our Content Security
@@ -48,21 +48,30 @@
       -
       - [1]: http://developer.chrome.com/extensions/contentSecurityPolicy.html
      -->
-      <script src="jquery-1.9.1.min.js"></script>
-      <script src="angular.min.js"></script>
-      <script src="angular-resource.min.js"></script>
-      <script src="bootstrap.js"></script>
-      <script src="highcharts.js"></script>
+    <script src="jquery-1.9.1.min.js"></script>
+    <script src="angular.min.js"></script>
+    <script src="angular-resource.min.js"></script>
+    <script src="bootstrap.js"></script>
+    <script src="highcharts.js"></script>
+    <script src="sha1-min.js"></script>
     <script src="popup.js"></script>
   </head>
   <body ng-controller="PopUpCtrl">
-    <h3><span ng-bind="data.WwNetwkName"></span> - <span ng-bind="data.WwNetwkTech"></span></h3>
-    Battery: <span ng-bind="data.BaBattStat"></span>/4
-    <span ng-show="data.BaBattChg == 1"> ( Charging! )</span>
-    <br/>
-   <span ng-bind="data.WiConnClients"></span> Devices Connected
-    <br/>
-   <span ng-bind="data.WwRssi"></span> Signal Bars<br/>
+    <h3>{{data.WwNetwkName}} - {{data.WwNetwkTech}}</h3>
+    <p>Battery: {{data.BaBattStat}}/4 <span ng-show="data.BaBattChg == 1"> ( Charging! )</span></p>
+    <p>Status:
+        <span ng-show="data.WwConnStatus == 0"> Searching</span>
+        <span ng-show="data.WwConnStatus == 1"> Connecting</span>
+        <span ng-show="data.WwConnStatus == 2"> Connected</span>
+        <span ng-show="data.WwConnStatus == 3"> Disconnecting</span>
+        <span ng-show="data.WwConnStatus == 4"> Disconnected</span>
+        <span ng-show="data.WwConnStatus == 5"> Not Activated</span>
+        <span ng-show="data.WwConnStatus == 6"> Modem Failure</span>
+        <span ng-show="data.WwConnStatus == 7"> Dormant</span>
+        <span ng-show="data.WwConnStatus == 8"> SIM Failure</span>
+    </p>
+    <p>{{data.WiConnClients}} Devices Connected</p>
+    <p>{{data.WwRssi}} Signal Bars</p>
 
     <h3>Speed</h3>
     <div id="speed_graph"></div>
@@ -77,14 +86,14 @@
             <th>Total</th>
         </tr>
         <tr>
-            <td ng-bind="data.session_start.format('h:mm:ss a')"></td>
+            <td ng-bind="data.session_start.format('HH:mm:ss')"></td>
             <td ng-bind="data.WwSessionTimeSecs|hms"></td>
             <td ng-bind="data.WwSessionTxMb|number:2"></td>
             <td ng-bind="data.WwSessionRxMb|number:2"></td>
             <td ng-bind="total_data()|number:2"></td>
         </tr>
         <tr ng-repeat="conn in connection_history|limitTo:10 track by $index">
-            <td ng-bind="conn.session_start.format('h:mm:ss a')"></td>
+            <td ng-bind="conn.session_start.format('HH:mm:ss')"></td>
             <td ng-bind="conn.WwSessionTimeSecs|hms"></td>
             <td ng-bind="conn.WwSessionTxMb|number:2"></td>
             <td ng-bind="conn.WwSessionRxMb|number:2"></td>
@@ -92,7 +101,7 @@
         </tr>
     </table>
     <div class="text-right">
-        <button class="btn btn-primary"> <span class="glyphicon glyphicon-repeat"></span> Reconnect</button>
+        <button class="btn btn-primary" id="reconnect" data-loading-text="Reconnecting..."> <span class="glyphicon glyphicon-repeat"></span> Reconnect</button>
     </div>
   </body>
 </html>

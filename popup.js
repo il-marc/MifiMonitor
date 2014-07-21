@@ -30,6 +30,53 @@ angular.module('PopUpApp', ['filters']);
 
 
 function PopUpCtrl($scope, $http, $timeout, $interval){
+
+    document.getElementById("reconnect").addEventListener("click", function(event) {
+        var stoken;
+        $("#reconnect").button('loading');
+        $.ajax('http://mifi.admin/')
+        .then(function(result) {
+            //AUTH
+            console.log(result);
+            var pwtoken = result.match(/pwtoken = "([a-z]+)"/)[1];
+            stoken = result.match(/<input type="hidden" name="stoken" value="([a-z]+)">/)[1];
+            console.log(pwtoken);
+            console.log(stoken);
+            var xsrf = $.param({
+                buttonlogin: 'Login',
+                AdPassword: hex_sha1('admin'+pwtoken),
+                todo: 'login',
+                nextfile: 'home.html',
+                stoken: stoken
+            });
+            return $http({
+                method: 'POST',
+                url: 'http://mifi.admin/login.cgi',
+                data: xsrf,
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            });
+        }).then(function (result) {
+            //DISCONNECT
+            var xsrf = $.param({
+                NP_WiCurrPf: 'Secure',
+                todo: 'disconnect',
+                nextfile: '',
+                stoken: stoken
+            });
+            return $http({
+                method: 'POST',
+                url: 'http://mifi.admin/home.cgi',
+                data: xsrf,
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            });
+        }).then(function (result) {
+            console.log(result);
+        })
+        .always(function () {
+            $("#reconnect").button('reset')
+        });
+    });
+
     $scope.update_pending = true;
     $scope.pull_new_data = function(){
         console.log("pulling new data");
@@ -67,9 +114,9 @@ function PopUpCtrl($scope, $http, $timeout, $interval){
                 type: 'datetime',
                 //tickPixelInterval: 150
                 dateTimeLabelFormats: {
-                    millisecond: '%l:%M:%S %p',
-                    second: '%l:%M:%S %p',
-                    minute: '%l:%M %p',
+                    millisecond: '%H:%M:%S',
+                    second: '%H:%M:%S',
+                    minute: '%H:%M',
                     hour: '%H:%M',
                     day: '%e. %b',
                     week: '%e. %b',
@@ -91,15 +138,18 @@ function PopUpCtrl($scope, $http, $timeout, $interval){
             tooltip: {
                 formatter: function() {
                         return '<b>'+ this.series.name +'</b><br/>'+
-                        Highcharts.dateFormat('%Y-%m-%d %l:%M:%S %p', this.x) +'<br/>'+
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
                         Highcharts.numberFormat(this.y, 2) + 'KB/s';
                 }
             },
             plotOptions: {
                 spline: {
+                    color: '#fa2100',
                     marker: {
                         enabled: false
                     }
+                },
+                line : {
                 }
             },
             legend: {
