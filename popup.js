@@ -32,11 +32,12 @@ angular.module('PopUpApp', ['filters']);
 function PopUpCtrl($scope, $http, $timeout, $interval){
 
     document.getElementById("reconnect").addEventListener("click", function(event) {
+        $scope.sleepticks = Number.MAX_VALUE;
         var stoken;
         $("#reconnect").button('loading');
         $.ajax('http://mifi.admin/')
         .then(function(result) {
-            //AUTH
+            //Login
             console.log(result);
             var pwtoken = result.match(/pwtoken = "([a-z]+)"/)[1];
             stoken = result.match(/<input type="hidden" name="stoken" value="([a-z]+)">/)[1];
@@ -56,7 +57,7 @@ function PopUpCtrl($scope, $http, $timeout, $interval){
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             });
         }).then(function (result) {
-            //DISCONNECT
+            //Disconnect
             var xsrf = $.param({
                 NP_WiCurrPf: 'Secure',
                 todo: 'disconnect',
@@ -70,10 +71,33 @@ function PopUpCtrl($scope, $http, $timeout, $interval){
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             });
         }).then(function (result) {
-            console.log(result);
-        })
-        .always(function () {
-            $("#reconnect").button('reset')
+            //Wait disconnected status
+            function checkStatus (WwConnStatus) {
+                if (WwConnStatus != 4) {
+                    $http.get("http://mifi.admin/getStatus.cgi?dataType=TEXT").success(function(data, status){
+                        WwConnStatus = data.match(/WwConnStatus=(\d)/)[1];
+                        checkStatus(WwConnStatus);
+                    });
+                } else {
+                    //Connect
+                    var xsrf = $.param({
+                        NP_WiCurrPf: 'Secure',
+                        todo: 'connect',
+                        WiCurrPf: 'Secure',
+                        nextfile: '',
+                        stoken: stoken
+                    });
+                    $http({
+                        method: 'POST',
+                        url: 'http://mifi.admin/home.cgi',
+                        data: xsrf,
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                    });
+                    $("#reconnect").button('reset');
+                    $scope.sleepticks = 1;
+                }
+            }
+            checkStatus(0);
         });
     });
 
